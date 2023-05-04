@@ -1,6 +1,5 @@
 const router = require('express').Router()
 const User = require('../models/User')
-const fs = require('fs')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const { includeStringFields } = require('../utils')
@@ -13,8 +12,8 @@ router.post('/', async (req, res) => {
         })
     }
     const { name, email, password } = req.body
-    const hasProfilePicture = typeof req.body.profilePicture == "string"
-    if(await User.findOne({ name, email })) {
+    
+    if(await User.findOne({ email })) {
         return res.status(400).json({
             success: false,
             code: "USER_ALEADY_EXISTS" 
@@ -23,13 +22,9 @@ router.post('/', async (req, res) => {
     const newUser = await new User({
         name,
         email,
-        password: bcrypt.hashSync(password, 1),
-        hasProfilePicture
+        password: bcrypt.hashSync(password, 1)
     }).save()
     
-    if(hasProfilePicture) {
-        fs.writeFileSync(`profileImages/${newUser.id}`, req.body.profilePicture)
-    }
     const token = jwt.sign({
         userId: newUser.id
     }, process.env.jwtSecret)

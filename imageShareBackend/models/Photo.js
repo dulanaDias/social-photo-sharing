@@ -11,7 +11,7 @@ const schema = mongoose.Schema({
         type: mongoose.Types.ObjectId
     },
     comments: {
-        type: [{comment: String, like: Number, dislike: Number}],
+        type: [{comment: String, like: Number, dislike: Number, love: Number, funny: Number}],
         default: []
     }
 })

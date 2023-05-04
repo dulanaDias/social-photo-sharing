@@ -1,9 +1,11 @@
 const express = require('express')
 const mongoose = require('mongoose')
+const cors = require('cors')
 
 const app = express()
 require('dotenv').config()
 
+app.use(cors({credentials:true,origin: process.env.clientUrl}))
 app.use(express.json())
 app.use("/login", require('./endpoints/login'))
 app.use("/register", require('./endpoints/register'))

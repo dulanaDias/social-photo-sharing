@@ -15,8 +15,8 @@ router.put('/', async (req, res) => {
     const { email, name } = updateInfo
 
     // check if user already with given name and email
-    if ((name || email)
-        && await User.findOne({ ...{ name, email } })) {
+    if (updateInfo.email
+        && await User.findOne({ email: updateInfo.email })) {
         return res.status(400).json({
             success: false,
             message: "user already exist with provide email or name",

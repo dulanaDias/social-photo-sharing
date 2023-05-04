@@ -2,33 +2,102 @@ import logo from './logo.svg';
 import './App.css';
 import background from './login-background.jpg'
 import { useState } from 'react';
-
+import axios from 'axios'
+import network from '../../network';
+import bcrypt from 'bcryptjs'
 
 function Login() {
   const [isLogin, setIsLogin] = useState(true)
 
+  const [details, setDetails] = useState({})
+
+  const onChange = (event) => {
+    const updatedDetails = { ...details }
+    updatedDetails[event.target.name] = event.target.value
+    setDetails(updatedDetails)
+  }
+
+  const onButtonPress = async () => {
+    if(isLogin) {
+      const result = await network.post('login', {
+        email: details.email,
+        password: details.password
+      })
+      if(result.data.success) {
+        localStorage.setItem('authToken', result.data.token)
+        console.log('login successful')
+      } else {
+        console.log(result.data)
+      }
+    } else {
+      console.log(details)
+      const result = await network.post('register', {
+        email: details.email,
+        password: details.password,
+        name: details.username
+      })
+      if(result.data.success) {
+        localStorage.setItem('authToken', result.data.token)
+        console.log('register successful')
+      } else {
+        console.log(result.data)
+      }
+    }
+  }
+
   const renderLogin = () => {
     return <>
       <div class="mb-3">
-        <input type="email" class="form-control p-3" id="emailControl" placeholder="Email address" />
+        <input
+          type="email"
+          name='email'
+          class="form-control p-3"
+          placeholder="Email address"
+          value={details.email}
+          onChange={onChange}
+        />
       </div>
       <div class="mb-3">
-        <input type="password" class="form-control p-3" id="passwordControl" placeholder="Password" />
+        <input
+          type="password"
+          name='password'
+          class="form-control p-3"
+          placeholder="Password"
+          value={details.password}
+          onChange={onChange}
+        />
       </div></>
   }
 
   const renderRegister = () => {
     return <>
       <div class="mb-3">
-        <input type="email" class="form-control p-3" id="emailControl" placeholder="Email address" />
+        <input
+          type="email"
+          class="form-control p-3"
+          name='email'
+          value={details.email}
+          onChange={onChange}
+          placeholder="Email address" />
       </div>
       <div class="mb-3">
-        <input type="password" class="form-control p-3" id="passwordControl" placeholder="Password" />
+        <input
+          type="password"
+          class="form-control p-3"
+          name='password'
+          value={details.password}
+          onChange={onChange}
+          placeholder="Password" />
       </div>
       <div class="mb-3">
-        <input class="form-control p-3" id="passwordControl" placeholder="Username" />
+        <input
+          class="form-control p-3"
+          name='username'
+          value={details.username}
+          onChange={onChange}
+          placeholder="Username" />
       </div>
-      </>
+    </>
   }
 
   return (
@@ -45,7 +114,9 @@ function Login() {
           {
             isLogin ? renderLogin() : renderRegister()
           }
-          <button className='btn fw-bold btn-primary'
+          <button 
+            className='btn fw-bold btn-primary'
+            onClick={onButtonPress}
             style={{ backgroundImage: 'linear-gradient(to right bottom, rgb(0 178 244), rgb(91 151 229))' }}
           >
             {isLogin ? "Login" : "Sign Up"}
