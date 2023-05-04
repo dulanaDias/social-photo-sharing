@@ -10,7 +10,7 @@ module.exports = async function authenticate(req, res, next) {
         if (err) return res.status(401).json({
             message: "unauthorized access, invalid token"
         })
-        req.user.id = decodedData.userId
+        req.user = { id: decodedData.userId }
         next()
     })
 }

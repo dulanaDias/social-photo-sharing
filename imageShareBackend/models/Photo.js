@@ -6,6 +6,10 @@ const schema = mongoose.Schema({
         required: true,
         type: String
     },
+    postedBy: {
+        required: true,
+        type: mongoose.Types.ObjectId
+    },
     comments: {
         type: [{comment: String, like: Number, dislike: Number}],
         default: []

@@ -4,14 +4,15 @@ const fs = require('fs')
 
 router.post('/', async (req, res) => {
     const base64Content = req.body.image
-    const sourceId = `${req.user.id}-${Date().toTimeString()}`
+    const sourceId = `${req.user.id}-${Date.now().toString()}`
     fs.writeFile(`images/${sourceId}`, base64Content, (err) => {
         console.log(`error has occured ${err}`)
     })
-    await new Photo({ sourceId }).save()
+    const newImage = await new Photo({ sourceId, postedBy: req.user.id }).save()
     return res.json({
         success: true,
-        message: "photo successfully uploaded"
+        message: "photo successfully uploaded",
+        image: newImage
     })
 })
 

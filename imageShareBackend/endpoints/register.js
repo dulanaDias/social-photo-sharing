@@ -2,15 +2,11 @@ const router = require('express').Router()
 const User = require('../models/User')
 const fs = require('fs')
 const jwt = require('jsonwebtoken')
-
-const areStringFields = (fields, body) => {
-    return fields.reduce((isStringType, field) => 
-        isStringType && typeof body[field] == 'string'
-    , true)
-}
+const bcrypt = require('bcrypt')
+const { includeStringFields } = require('../utils')
 
 router.post('/', async (req, res) => {
-    if(!areStringFields(['name', 'email', 'password'], req.body)) {
+    if(!includeStringFields(['name', 'email', 'password'], req.body)) {
         return res.status(400).json({
             success: false,
             message: "profile basic details are missing"
@@ -27,7 +23,7 @@ router.post('/', async (req, res) => {
     const newUser = await new User({
         name,
         email,
-        password,
+        password: bcrypt.hashSync(password, 1),
         hasProfilePicture
     }).save()
     

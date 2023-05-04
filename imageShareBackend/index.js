@@ -5,9 +5,11 @@ const app = express()
 require('dotenv').config()
 
 app.use(express.json())
+app.use("/login", require('./endpoints/login'))
 app.use("/register", require('./endpoints/register'))
 // handle authentication
 app.use(require('./middleware/auth'))
+app.use("/user", require('./endpoints/user'))
 app.use("/photo", require('./endpoints/photo'))
 
 app.use((req,res)=>{
