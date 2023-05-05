@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const Comment = require('./Comment')
 
 const schema = mongoose.Schema({
     sourceId: {
@@ -10,8 +9,30 @@ const schema = mongoose.Schema({
         required: true,
         type: mongoose.Types.ObjectId
     },
+    description: {
+        type: String
+    },
+    like: {
+        type: Number,
+        default: 0
+    },
+    dislike: {
+        type: Number,
+        default: 0
+    },
+    love: {
+        type: Number,
+        default: 0
+    },
+    funny: {
+        type: Number,
+        default: 0
+    },
     comments: {
-        type: [{comment: String, like: Number, dislike: Number, love: Number, funny: Number}],
+        type: [{
+            username: String,
+            comment: String
+        }],
         default: []
     }
 })

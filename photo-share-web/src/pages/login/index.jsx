@@ -4,7 +4,6 @@ import background from './login-background.jpg'
 import { useState } from 'react';
 import axios from 'axios'
 import network from '../../network';
-import bcrypt from 'bcryptjs'
 
 function Login() {
   const [isLogin, setIsLogin] = useState(true)
