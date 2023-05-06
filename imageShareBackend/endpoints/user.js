@@ -3,6 +3,10 @@ const User = require('../models/User')
 const fs = require('fs')
 const { mayIncludeStringFields } = require('../utils')
 
+router.get('/', async (req, res) => {
+    return res.json(await User.findById(req.user.id))
+})
+
 router.put('/', async (req, res) => {
     const updateInfo = req.body
     if(!mayIncludeStringFields(['name', 'email', 'password', 'profilePicture'], updateInfo)) {
@@ -11,8 +15,6 @@ router.put('/', async (req, res) => {
             message: "one of the fields are invalid format"
         })
     }
-
-    const { email, name } = updateInfo
 
     // check if user already with given name and email
     if (updateInfo.email

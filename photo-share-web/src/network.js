@@ -2,7 +2,9 @@ import axios from 'axios'
 const baseUrl = process.env.REACT_APP_API_URL
 
 export default {
-    post: async (endpoint, data, tokenKey = undefined ) => {
+    post: async (endpoint, data) => {
+        const tokenKey = localStorage.getItem('authToken')
+        
         if(tokenKey)
             return await axios.post(`${baseUrl}/${endpoint}`, data, {
                 headers: {
@@ -11,7 +13,9 @@ export default {
             })
         return await axios.post(`${baseUrl}/${endpoint}`, data)
     },
-    put: async (endpoint, data, tokenKey = undefined ) => {
+    put: async (endpoint, data) => {
+        const tokenKey = localStorage.getItem('authToken')
+
         if(tokenKey)
             return await axios.put(`${baseUrl}/${endpoint}`, data, {
                 headers: {
@@ -20,7 +24,9 @@ export default {
             })
         return await axios.put(`${baseUrl}/${endpoint}`, data)
     },
-    get: async (endpoint, tokenKey = undefined ) => {
+    get: async (endpoint) => {
+        const tokenKey = localStorage.getItem('authToken')
+
         if(tokenKey)
             return await axios.get(`${baseUrl}/${endpoint}`, {
                 headers: {
@@ -29,7 +35,9 @@ export default {
             })
         return await axios.get(`${baseUrl}/${endpoint}`)
     },
-    delete: async (endpoint, tokenKey = undefined ) => {
+    delete: async (endpoint) => {
+        const tokenKey = localStorage.getItem('authToken')
+
         if(tokenKey)
             return await axios.delete(`${baseUrl}/${endpoint}`, {
                 headers: {

@@ -6,7 +6,11 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
+.reactionButton:hover {
+  background-color: antiquewhite;
+  border-radius: 0.375rem;
+  border: solid 1px rgb(136, 102, 57);
+}
 .col-gutter *:not(:first-child) {
   margin-top: 5px;
 }

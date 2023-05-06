@@ -3,8 +3,9 @@ import profileSettings from '../dashboard/assets/profileSettings.png'
 import blankProfile from '../dashboard/assets/blankProfile.webp'
 import EditableField from './components/EditableField'
 import Post from './components/Post'
-import { useState } from 'react'
-
+import { useEffect, useState } from 'react'
+import Network from '../../network'
+import { useNavigate } from 'react-router-dom'
 
 const styles = {
     icon: {
@@ -33,30 +34,73 @@ const styles = {
 
 function Dashboard() {
 
+    const navigate = useNavigate()
     const [captureDescription, setCaptureDescription] = useState(false)
+    const [description, setDescription] = useState("")
+    const [posts, setPosts] = useState([])
 
-    const onPublishPhoto = async (event) => {
-        console.log('called')
+    const refreshPosts = async () => {
+        const result = await Network.get('photo')
+
+        if (result.data.success) {
+            console.log(result.data.data)
+            setPosts(result.data.data)
+        }
+    }
+
+    const logout = () => {
+        localStorage.clear()
+        navigate('/auth')
+    }
+
+    useEffect(() => {
+        refreshPosts()
+    }, [])
+
+    const onPublishPhoto = (event) => {
         const reader = new FileReader()
-        reader.onload = () => {
-            console.log(reader.result)
-            setCaptureDescription(true)
+        reader.onload = async () => {
+            const result = await Network.post('photo', {
+                image: reader.result,
+                description
+            })
+            
+            if (result.data.success) {
+                setDescription("")
+                setCaptureDescription(false)
+                refreshPosts()
+            }
         }
         reader.onerror = () => {
             console.log(reader.error)
         }
-        console.log('reading file...')
-        reader.readAsDataURL(event.target.files[0])
-        event.target.value = ''
+        reader.readAsDataURL(event.currentTarget.getElementsByTagName('input')[0].files[0])
     }
 
-    const cancelPhotoPost = (event) => {
-        event.currentTarget.getElementsByTagName('input')[0].value = ''
+    const cancelPhotoPost = () => {
         setCaptureDescription(false)
+        setDescription("")
     }
+
 
     const onFileUploadClick = (event) => {
+        event.currentTarget.getElementsByTagName('input')[0].value = ''
         event.currentTarget.getElementsByTagName('input')[0].click()
+    }
+
+    const onReacted = async (reactionType, didReacted, id) => {
+        const result = await Network.put('photo/react', { type: reactionType, reacted: didReacted, id })
+        if(result.data.success) {
+            const updatedReactions = result.data.updatedReactions
+            const index = posts.findIndex((post) => post.id == id)
+            console.log({updatedReactions})
+            const { like, dislike, love, funny, selfReaction } = updatedReactions
+            posts[index] = {
+                ...posts[index],
+                like, dislike, love, funny, selfReaction
+            }
+            setPosts([...posts])
+        }
     }
 
     return <div className="Dashboard">
@@ -84,7 +128,11 @@ function Dashboard() {
             <div class="container-fluid">
                 <a class="navbar-brand" href="#">Photo Sharing</a>
                 <div>
-                    <button className='btn ms-3' style={styles.navButton}>
+                    <button
+                        className='btn ms-3'
+                        style={styles.navButton}
+                        onClick={logout}
+                    >
                         <img src={logoutIcon} style={styles.icon} />
                     </button>
                 </div>
@@ -108,19 +156,26 @@ function Dashboard() {
 
                             {captureDescription && <div className='mt-3 row'>
                                 <label class="form-label">Tell something photo</label>
-                                <textarea class="form-control" rows="3"></textarea>
+                                <textarea class="form-control" value={description}
+                                    onChange={
+                                        (e) => setDescription(e.target.value)
+                                    }
+                                    rows="3"
+                                 />
                             </div>}
                             <div className='row d-flex justify-content-center'>
                                 <button
-                                    className={`btn btn-${captureDescription ? 'danger' : 'primary'}`}
-                                    onClick={captureDescription ? cancelPhotoPost : onFileUploadClick} >
+                                    className="btn btn-primary"
+                                    onClick={captureDescription ? onPublishPhoto : onFileUploadClick} >
                                     <input type="file"
-                                        hidden accept="image/png, image/gif, image/jpeg"
-                                        onChange={onPublishPhoto} />
-                                    {captureDescription ? "cancel" : "Post Photo"}
+                                        onChange={() => { setCaptureDescription(true) }}
+                                        hidden accept="image/png, image/gif, image/jpeg" />
+                                    Post Photo
                                 </button>
-                                {captureDescription && <button className='btn btn-primary'  >
-                                    Post
+                                {captureDescription && <button
+                                    onClick={cancelPhotoPost}
+                                    className='btn btn-danger' >
+                                    Cancel
                                 </button>}
                             </div>
 
@@ -128,11 +183,12 @@ function Dashboard() {
                     </div>
                 </div>
             </div>
-            <div className='col-8' style={styles.photoListContainer}>
-                <Post />
-                <Post />
-                <Post />
-                <Post />
+            <div
+                className='col-8'
+                style={styles.photoListContainer}>
+                {
+                    posts.map((post) => <Post key={post.id} data={post} setReaction={onReacted} />)
+                }
 
             </div>
 

@@ -4,11 +4,12 @@ const fs = require('fs')
 
 router.post('/', async (req, res) => {
     const base64Content = req.body.image
+    const description = req.body.description || "No description"
     const sourceId = `${req.user.id}-${Date.now().toString()}`
     fs.writeFile(`images/${sourceId}`, base64Content, (err) => {
         console.log(`error has occured ${err}`)
     })
-    const newImage = await new Photo({ sourceId, postedBy: req.user.id }).save()
+    const newImage = await new Photo({ sourceId, postedBy: req.user.id, description }).save()
     return res.json({
         success: true,
         message: "photo successfully uploaded",
@@ -16,8 +17,39 @@ router.post('/', async (req, res) => {
     })
 })
 
+const getSelfReaction = (req, data) => {
+    const reactions = ['like', 'dislike', 'love', 'funny']
+    for(const reaction of reactions) {
+        if(data[reaction].includes(req.user.id))
+            return reaction
+    }
+    return 'none'
+}
+
 router.get('/', async (req, res) => {
-    return res.json(await Photo.find({}, 'id sourceId postedBy'))
+    const photos = await Photo
+        .find({})
+        .populate('postedBy')
+    
+    const data = photos.map((value) => ({
+        id: value.id,
+        image: fs.readFileSync(`images/${value.sourceId}`).toString('utf-8'),
+        selfReaction: getSelfReaction(req, value),
+        like: value.like.length,
+        dislike: value.dislike.length,
+        love: value.love.length,
+        funny: value.funny.length,
+        description: value.description,
+        profile: {
+            image: fs.existsSync(`profileImages/${value.postedBy.id}`) ? fs.readFileSync(`profileImages/${value.postedBy.id}`) : '',
+            username: value.postedBy.name
+        }
+    }))
+    
+    return res.json({
+        success: true,
+        data
+    })
 })
 
 router.get('/:photoId', async (req, res) => {
@@ -35,6 +67,25 @@ router.get('/:photoId', async (req, res) => {
         })
     }
 })
+
+router.put('/react', async (req, res) => {
+    const { type, reacted, id } = req.body
+    var updatedPost
+    if(reacted)
+        updatedPost = await Photo.findByIdAndUpdate(id, { $push: { [type]: req.user.id } }, { returnOriginal: false })
+    else
+        updatedPost = await Photo.findByIdAndUpdate(id, { $pull: { [type]: req.user.id } }, { returnOriginal: false })
+    return res.json({
+        success: true,
+        updatedReactions: {
+            selfReaction: getSelfReaction(req, updatedPost),
+            like: updatedPost.like.length,
+            dislike: updatedPost.dislike.length,
+            love: updatedPost.love.length,
+            funny: updatedPost.funny.length
+        }
+    })
+})  
 
 router.post('/:photoId/comment/', async (req, res) => {
     const photoId = req.params.photoid

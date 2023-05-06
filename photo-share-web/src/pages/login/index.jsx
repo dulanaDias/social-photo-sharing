@@ -2,13 +2,19 @@ import logo from './logo.svg';
 import './App.css';
 import background from './login-background.jpg'
 import { useState } from 'react';
-import axios from 'axios'
 import network from '../../network';
+import { useNavigate } from 'react-router-dom'
 
 function Login() {
   const [isLogin, setIsLogin] = useState(true)
 
-  const [details, setDetails] = useState({})
+  const [details, setDetails] = useState({
+    email: '',
+    password: '',
+    username: ''
+  })
+
+  const navigate = useNavigate()
 
   const onChange = (event) => {
     const updatedDetails = { ...details }
@@ -24,12 +30,12 @@ function Login() {
       })
       if(result.data.success) {
         localStorage.setItem('authToken', result.data.token)
-        console.log('login successful')
+        navigate('/home', { replace: true })
       } else {
         console.log(result.data)
       }
     } else {
-      console.log(details)
+      
       const result = await network.post('register', {
         email: details.email,
         password: details.password,
@@ -37,7 +43,7 @@ function Login() {
       })
       if(result.data.success) {
         localStorage.setItem('authToken', result.data.token)
-        console.log('register successful')
+        navigate('/home', { replace: true })
       } else {
         console.log(result.data)
       }

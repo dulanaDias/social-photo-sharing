@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-
+const ObjectId = mongoose.Types.ObjectId
 const schema = mongoose.Schema({
     sourceId: {
         required: true,
@@ -7,26 +7,27 @@ const schema = mongoose.Schema({
     },
     postedBy: {
         required: true,
-        type: mongoose.Types.ObjectId
+        type: mongoose.Types.ObjectId,
+        ref: "User"
     },
     description: {
         type: String
     },
     like: {
-        type: Number,
-        default: 0
+        type: [ObjectId],
+        default: []
     },
     dislike: {
-        type: Number,
-        default: 0
+        type: [ObjectId],
+        default: []
     },
     love: {
-        type: Number,
-        default: 0
+        type: [ObjectId],
+        default: []
     },
     funny: {
-        type: Number,
-        default: 0
+        type: [ObjectId],
+        default: []
     },
     comments: {
         type: [{

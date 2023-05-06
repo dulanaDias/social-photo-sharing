@@ -4,11 +4,18 @@ import './index.css';
 import Login from './pages/login';
 import reportWebVitals from './reportWebVitals';
 import Dashboard from './pages/dashboard';
+import { BrowserRouter, Router, Route, Routes } from 'react-router-dom'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <Dashboard />
+    <BrowserRouter>
+      <Routes>
+        <Route path='/' element={<Login />} />
+        <Route path='/auth' element={<Login />} />
+        <Route path='/home' element={<Dashboard />} />
+      </Routes>
+    </BrowserRouter>
   </React.StrictMode>
 );
 
