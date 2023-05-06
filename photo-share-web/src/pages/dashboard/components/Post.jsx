@@ -37,6 +37,22 @@ export default ({ data, setReaction, loadComments, postComment }) => {
         <div class="card ps-0 pe-0" style={{ width: "50%" }}>
             <img src={data.image} class="card-img-top" alt="..." />
             <div class="card-body">
+                
+                <div style={{ position: 'relative', marginBottom: "45px" }}>
+                <div className="d-flex align-items-center position-absolute" style={{ top: "-45px" }}>
+                <img 
+                    src={data.profile.image} 
+                    style={{ 
+                        width: 90, 
+                        height: 90, 
+                        borderRadius: '50%'
+                    }} 
+                />
+                <h5 class="card-title ms-2" >{data.profile.username}</h5>
+                    </div>
+                </div>
+                
+                <p class="card-text">{data.description}</p>
                 {data.selfReaction != "none" && <span className='row'>{`You have reacted on this post with ${data.selfReaction}`}</span>}
                 <div className="row">
                     <button
@@ -68,8 +84,7 @@ export default ({ data, setReaction, loadComments, postComment }) => {
                         <span>{data.funny}</span>
                     </button>
                 </div>
-                <h5 class="card-title">{`Uploaded by ${data.profile.username}`}</h5>
-                <p class="card-text">{data.description}</p>
+                
                 <button
                     class={`btn btn-${commentsVisible ? 'danger' : 'primary'}`}
                     onClick={() => {
@@ -85,15 +100,8 @@ export default ({ data, setReaction, loadComments, postComment }) => {
             <div class="card-body">
                 <h5 class="card-title">Comments</h5>
                 <div className="row"
-                    style={{ overflow: 'scroll' }}
+                    style={{ overflow: 'scroll', maxHeight: '60vh' }}
                 >
-                    {/* <Comment key={`comment-key-dsd`} data={{
-                        body: 'hello world',
-                        profile: {
-                            name: 'hjfbdshbfsf',
-                            picture: ''
-                        }
-                    }} /> */}
                     {(data.comments || []).map((comment, index) => 
                         <Comment key={`comment-key-${index}`} data={comment} />
                     )}

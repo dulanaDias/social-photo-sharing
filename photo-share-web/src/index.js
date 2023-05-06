@@ -7,16 +7,21 @@ import Dashboard from './pages/dashboard';
 import { BrowserRouter, Router, Route, Routes } from 'react-router-dom'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+const isAuthenticated = !!localStorage.getItem('authToken')
+
 root.render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path='/' element={<Login />} />
-        <Route path='/auth' element={<Login />} />
-        <Route path='/home' element={<Dashboard />} />
+        <Route path='/' element={isAuthenticated ?<Dashboard /> : <Login />} />
+        {isAuthenticated ? 
+          <Route path='/home' element={<Dashboard />} /> :
+          <Route path='/auth' element={<Login />} />
+        }
+        <Route path='*' element={isAuthenticated ?<Dashboard /> : <Login />} />
       </Routes>
     </BrowserRouter>
-  </React.StrictMode>
+  // </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

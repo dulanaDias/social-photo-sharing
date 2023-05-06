@@ -39,6 +39,11 @@ function Dashboard() {
     const [captureDescription, setCaptureDescription] = useState(false)
     const [description, setDescription] = useState("")
     const [posts, setPosts] = useState([])
+    const [userInfo, setUserInfo] = useState({
+        name: '',
+        email: '',
+        profilePicture: ''
+    })
 
     const refreshPosts = async () => {
         const result = await Network.get('photo')
@@ -54,6 +59,16 @@ function Dashboard() {
     }
 
     useEffect(() => {
+        Network.get('user/profile').then((result) => {
+            const fetchedData = result.data.profile
+            
+            const profileData = {
+                name: fetchedData.name,
+                email: fetchedData.email,
+                profilePicture: fetchedData.profilePicture
+            }
+            setUserInfo(profileData)
+        })
         refreshPosts()
     }, [])
 
@@ -93,9 +108,6 @@ function Dashboard() {
                 refreshPosts()
             }
         }
-        reader.onerror = () => {
-            console.log(reader.error)
-        }
         reader.readAsDataURL(event.currentTarget.getElementsByTagName('input')[0].files[0])
     }
 
@@ -104,6 +116,34 @@ function Dashboard() {
         setDescription("")
     }
 
+    const onProfilePictureChange = (event) => {
+        const reader = new FileReader()
+        reader.onload = async () => {
+            const result = await Network.put('user/profile', {
+                profilePicture: reader.result
+            })
+            setUserInfo({
+                ...userInfo,
+                profilePicture: result.data.profile.profilePicture
+            })
+        }
+
+        reader.readAsDataURL(event.target.files[0])
+    }
+
+    const onProfileChange = (attributeName) => {
+        return async (value) => {
+            const result = await Network.put('user/profile', {
+                [attributeName]: value
+            })
+
+            if(attributeName == "password") return
+            setUserInfo({
+                ...userInfo,
+                [attributeName]: result.data.profile[attributeName]
+            })
+        }
+    }
 
     const onFileUploadClick = (event) => {
         event.currentTarget.getElementsByTagName('input')[0].value = ''
@@ -167,14 +207,16 @@ function Dashboard() {
                         <h5 className='card-title'>Profile</h5>
                         <div className='col col-gutter'>
                             <div className='d-flex  align-items-center'>
-                                <img src={blankProfile} className='' style={styles.profilePicture} />
-                                <button className='ms-2 btn btn-primary'>Change</button>
+                                <img src={userInfo.profilePicture || blankProfile} style={styles.profilePicture} />
+                                <button className='ms-2 btn btn-primary' onClick={onFileUploadClick}>
+                                    <input type="file" hidden onChange={onProfilePictureChange} />
+                                    Change
+                                </button>
                             </div>
 
-                            <EditableField value={"Nishain De Silva"}  />
-                            <EditableField value={"nishain.atomic@gmail.com"} />
-                            <EditableField value={"sample"} isPassword />
-
+                            <EditableField value={userInfo.name} setvalue={onProfileChange('name')} />
+                            <EditableField value={userInfo.email} setvalue={onProfileChange('email')} />
+                            <EditableField value={userInfo.password} isPassword setvalue={onProfileChange('password')} />
 
                             {captureDescription && <div className='mt-3 row'>
                                 <label class="form-label">Tell something photo</label>

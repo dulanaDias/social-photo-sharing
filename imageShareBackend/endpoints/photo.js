@@ -1,14 +1,13 @@
 const router = require('express').Router()
 const Photo = require('../models/Photo')
 const fs = require('fs')
+const { getProfilePicture } = require('../utils')
 
 router.post('/', async (req, res) => {
     const base64Content = req.body.image
     const description = req.body.description || "No description"
     const sourceId = `${req.user.id}-${Date.now().toString()}`
-    fs.writeFile(`images/${sourceId}`, base64Content, (err) => {
-        console.log(`error has occured ${err}`)
-    })
+    fs.writeFile(`images/${sourceId}`, base64Content)
     const newImage = await new Photo({ sourceId, postedBy: req.user.id, description }).save()
     return res.json({
         success: true,
@@ -85,20 +84,14 @@ router.put('/react', async (req, res) => {
             funny: updatedPost.funny.length
         }
     })
-})  
-
-const getProfilePicture = (profileId) => {
-    return fs.existsSync(`profileImages/${profileId}`)
-        ? fs.readFileSync(`profileImages/${profileId}`)
-        : ''
-}
+})
 
 router.get('/:photoId/comment/', async (req, res) => {
     const photoId = req.params.photoId
     const photoWithComments = await Photo.findById(photoId).populate('comments.user')
     const comments = photoWithComments.comments.map(rawComment => ({
         profile: {
-            picture: getProfilePicture(rawComment.id),
+            picture: getProfilePicture(rawComment.user.id),
             name: rawComment.user.name
         },
         body: rawComment.comment
@@ -119,7 +112,7 @@ router.post('/:photoId/comment/', async (req, res) => {
     ).populate('comments.user')
     const comments = updatedData.comments.map(rawComment => ({
         profile: {
-            picture: getProfilePicture(rawComment.id),
+            picture: getProfilePicture(rawComment.user.id),
             name: rawComment.user.name
         },
         body: rawComment.comment
