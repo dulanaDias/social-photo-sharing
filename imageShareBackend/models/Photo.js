@@ -7,7 +7,7 @@ const schema = mongoose.Schema({
     },
     postedBy: {
         required: true,
-        type: mongoose.Types.ObjectId,
+        type: ObjectId,
         ref: "User"
     },
     description: {
@@ -31,7 +31,10 @@ const schema = mongoose.Schema({
     },
     comments: {
         type: [{
-            username: String,
+            user: {
+                type: ObjectId,
+                ref: "User"
+            },
             comment: String
         }],
         default: []

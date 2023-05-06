@@ -41,7 +41,7 @@ router.get('/', async (req, res) => {
         funny: value.funny.length,
         description: value.description,
         profile: {
-            image: fs.existsSync(`profileImages/${value.postedBy.id}`) ? fs.readFileSync(`profileImages/${value.postedBy.id}`) : '',
+            image: getProfilePicture(value.postedBy.id),
             username: value.postedBy.name
         }
     }))
@@ -87,17 +87,48 @@ router.put('/react', async (req, res) => {
     })
 })  
 
-router.post('/:photoId/comment/', async (req, res) => {
-    const photoId = req.params.photoid
-    const photo = await Photo.findById(photoId)
-    if (!photo) {
-        return res.json({
-            success: false,
-            code: 'PHOTO_NOT_FOUND'
-        })
-    }
-    console.log(Object.keys(photo))
+const getProfilePicture = (profileId) => {
+    return fs.existsSync(`profileImages/${profileId}`)
+        ? fs.readFileSync(`profileImages/${profileId}`)
+        : ''
+}
 
+router.get('/:photoId/comment/', async (req, res) => {
+    const photoId = req.params.photoId
+    const photoWithComments = await Photo.findById(photoId).populate('comments.user')
+    const comments = photoWithComments.comments.map(rawComment => ({
+        profile: {
+            picture: getProfilePicture(rawComment.id),
+            name: rawComment.user.name
+        },
+        body: rawComment.comment
+    }))
+
+    return res.json({
+        success: true,
+        comments
+    })
+})
+
+router.post('/:photoId/comment/', async (req, res) => {
+    const photoId = req.params.photoId
+    const comment = req.body.comment
+    const updatedData = await Photo.findByIdAndUpdate(photoId, 
+        { $push: { comments: { user: req.user.id, comment } } },
+        { returnOriginal: false }
+    ).populate('comments.user')
+    const comments = updatedData.comments.map(rawComment => ({
+        profile: {
+            picture: getProfilePicture(rawComment.id),
+            name: rawComment.user.name
+        },
+        body: rawComment.comment
+    }))
+    
+    return res.json({
+        success: true,
+        comments
+    })
 })
 
 module.exports = router

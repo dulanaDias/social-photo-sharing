@@ -6,6 +6,7 @@ import Post from './components/Post'
 import { useEffect, useState } from 'react'
 import Network from '../../network'
 import { useNavigate } from 'react-router-dom'
+import network from '../../network'
 
 const styles = {
     icon: {
@@ -43,7 +44,6 @@ function Dashboard() {
         const result = await Network.get('photo')
 
         if (result.data.success) {
-            console.log(result.data.data)
             setPosts(result.data.data)
         }
     }
@@ -57,6 +57,28 @@ function Dashboard() {
         refreshPosts()
     }, [])
 
+    const loadComments = async (postId) => {
+        const comments = await Network.get(`photo/${postId}/comment`)
+        if(comments.data.success) {
+            const index = posts.findIndex((post) => post.id == postId)
+            posts[index].comments = comments.data.comments
+            setPosts([...posts])
+        }
+        
+    }
+
+    const addComment = async (comment, postId) => {
+        const comments = await network.post(`photo/${postId}/comment`, {
+            comment
+        })
+        if(comments.data.success) {
+            const index = posts.findIndex((post) => post.id == postId)
+            
+            posts[index].comments = comments.data.comments
+            setPosts([...posts])
+        }
+    }
+
     const onPublishPhoto = (event) => {
         const reader = new FileReader()
         reader.onload = async () => {
@@ -64,7 +86,7 @@ function Dashboard() {
                 image: reader.result,
                 description
             })
-            
+
             if (result.data.success) {
                 setDescription("")
                 setCaptureDescription(false)
@@ -93,7 +115,7 @@ function Dashboard() {
         if(result.data.success) {
             const updatedReactions = result.data.updatedReactions
             const index = posts.findIndex((post) => post.id == id)
-            console.log({updatedReactions})
+            
             const { like, dislike, love, funny, selfReaction } = updatedReactions
             posts[index] = {
                 ...posts[index],
@@ -149,7 +171,7 @@ function Dashboard() {
                                 <button className='ms-2 btn btn-primary'>Change</button>
                             </div>
 
-                            <EditableField value={"Nishain De Silva"} />
+                            <EditableField value={"Nishain De Silva"}  />
                             <EditableField value={"nishain.atomic@gmail.com"} />
                             <EditableField value={"sample"} isPassword />
 
@@ -161,7 +183,7 @@ function Dashboard() {
                                         (e) => setDescription(e.target.value)
                                     }
                                     rows="3"
-                                 />
+                                />
                             </div>}
                             <div className='row d-flex justify-content-center'>
                                 <button
@@ -187,7 +209,14 @@ function Dashboard() {
                 className='col-8'
                 style={styles.photoListContainer}>
                 {
-                    posts.map((post) => <Post key={post.id} data={post} setReaction={onReacted} />)
+                    posts.map((post) =>
+                        <Post
+                            key={post.id}
+                            data={post}
+                            setReaction={onReacted}
+                            loadComments={loadComments}
+                            postComment={addComment}
+                        />)
                 }
 
             </div>

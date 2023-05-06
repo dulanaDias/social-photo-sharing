@@ -6,7 +6,7 @@ const app = express()
 require('dotenv').config()
 
 app.use(cors({credentials:true,origin: process.env.clientUrl}))
-app.use(express.json())
+app.use(express.json({limit: '20mb'}))
 app.use("/login", require('./endpoints/login'))
 app.use("/register", require('./endpoints/register'))
 // handle authentication
