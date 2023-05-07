@@ -4,13 +4,14 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Settings from "./pages/Settings";
 
 export default () => {
     const Stack = createNativeStackNavigator()
   
     return <NavigationContainer>
         <Stack.Navigator
-             initialRouteName="home">
+             initialRouteName="settings">
             <Stack.Screen
                 name="auth"
                 component={Login}
@@ -24,7 +25,14 @@ export default () => {
                 options={{
                     headerShown: false
                 }}
-            />    
+            />
+            <Stack.Screen
+                name="settings"
+                component={Settings}
+                options={{
+                    headerShown: false
+                }}
+            />
         </Stack.Navigator>
     </NavigationContainer>
 }

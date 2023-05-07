@@ -3,10 +3,10 @@ import './App.css';
 import background from './login-background.jpg'
 import { useState } from 'react';
 import network from '../../network';
-import { useNavigate } from 'react-router-dom'
 
 function Login() {
   const [isLogin, setIsLogin] = useState(true)
+  const [alertMessage, setAlertMessage] = useState('')
 
   const [details, setDetails] = useState({
     email: '',
@@ -14,7 +14,6 @@ function Login() {
     username: ''
   })
 
-  const navigate = useNavigate()
 
   const onChange = (event) => {
     const updatedDetails = { ...details }
@@ -22,30 +21,37 @@ function Login() {
     setDetails(updatedDetails)
   }
 
+  const showAlert = (message) => {
+    setAlertMessage(message)
+    setTimeout(() => {
+      setAlertMessage('')
+    }, 3500)
+  }
+
   const onButtonPress = async () => {
-    if(isLogin) {
+    if (isLogin) {
       const result = await network.post('login', {
         email: details.email,
         password: details.password
       })
-      if(result.data.success) {
+      if (result.data.success) {
         localStorage.setItem('authToken', result.data.token)
-        navigate('/home', { replace: true })
+        window.location.href = "/home"
       } else {
-        console.log(result.data)
+        showAlert(result.data.message)
       }
     } else {
-      
+
       const result = await network.post('register', {
         email: details.email,
         password: details.password,
         name: details.username
       })
-      if(result.data.success) {
+      if (result.data.success) {
         localStorage.setItem('authToken', result.data.token)
-        navigate('/home', { replace: true })
+        window.location.href = "/home"
       } else {
-        console.log(result.data)
+        showAlert(result.data.message)
       }
     }
   }
@@ -78,6 +84,14 @@ function Login() {
     return <>
       <div class="mb-3">
         <input
+          class="form-control p-3"
+          name='username'
+          value={details.username}
+          onChange={onChange}
+          placeholder="Username" />
+      </div>
+      <div class="mb-3">
+        <input
           type="email"
           class="form-control p-3"
           name='email'
@@ -93,14 +107,6 @@ function Login() {
           value={details.password}
           onChange={onChange}
           placeholder="Password" />
-      </div>
-      <div class="mb-3">
-        <input
-          class="form-control p-3"
-          name='username'
-          value={details.username}
-          onChange={onChange}
-          placeholder="Username" />
       </div>
     </>
   }
@@ -119,7 +125,11 @@ function Login() {
           {
             isLogin ? renderLogin() : renderRegister()
           }
-          <button 
+          {!!alertMessage && <div class="alert alert-danger" role="alert">
+            {alertMessage}
+          </div>}
+
+          <button
             className='btn fw-bold btn-primary'
             onClick={onButtonPress}
             style={{ backgroundImage: 'linear-gradient(to right bottom, rgb(0 178 244), rgb(91 151 229))' }}

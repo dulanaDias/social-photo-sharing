@@ -5,15 +5,16 @@ import like from '../assets/like.png'
 import dislike from '../assets/dislike.png'
 import love from '../assets/heart.png'
 import funny from '../assets/laugh.png'
+import send from '../assets/send.png'
 import Button from "./Button"
 import TextField from './TextField'
 
 const Comment = ({ data }) => {
-    <View style={styles.commentRoot}>
+    return <View style={styles.commentRoot}>
         <View style={styles.commentProfile}>
             <Image
                 style={styles.commentProfileImage}
-                source={{uri: data.profile.picture} || blankProfile} />
+                source={data.profile.picture ? { uri: data.profile.picture } : blankProfile} />
             <Text style={{ fontWeight: "800" }}>{data.profile.name}</Text>
         </View>
         <Text>{data.body}</Text>
@@ -37,7 +38,7 @@ export default ({ data, setReaction, loadComments, postComment }) => {
 
     useEffect(() => {
         if (commentsExpanded) {
-            loadComments()
+            loadComments(data.id)
         }
     }, [commentsExpanded])
 
@@ -46,14 +47,18 @@ export default ({ data, setReaction, loadComments, postComment }) => {
     }
 
     return <View style={styles.root}>
-        <Image
-            source={{uri: data.profile.image} || blankProfile}
-            style={styles.profilePicture}
-        />
-        <Text>{data.profile.name}</Text>
-        <Image source={{uri: data.image}} style={styles.image} />
-        <Text>{data.description}</Text>
-        <Text style={styles.selfReactionLabel}>{`You have reacted on this post with ${data.selfReaction}`}</Text>
+        <View style={styles.postProfileBanner}>
+            <Image
+                source={data.profile.image ? { uri: data.profile.image } : blankProfile}
+                style={styles.profilePicture}
+            />
+            <Text style={styles.topUsername}>{data.profile.username}</Text>
+        </View>
+
+        <Image resizeMode="contain"
+            source={data.image ? { uri: data.image } : blankProfile} style={styles.image} />
+        <Text style={styles.description}>{data.description}</Text>
+        {data.selfReaction != "none" && <Text style={styles.selfReactionLabel}>{`You have reacted on this post with ${data.selfReaction}`}</Text>}
         <View style={styles.reactionContainer}>
             <TouchableOpacity style={styles.reaction} onPress={react('like')} >
                 <Image source={like} style={styles.reactionIcon} />
@@ -72,73 +77,122 @@ export default ({ data, setReaction, loadComments, postComment }) => {
                 <Text>{data.funny}</Text>
             </TouchableOpacity>
         </View>
-        <Button color="white" backgroundColor="lightBlue"
+        <Button
+            color="black"
+            style={styles.commentSectionExpandButton}
             onPress={() => { setCommentsExpanded(!commentsExpanded) }}>
             View Comments
         </Button>
         {commentsExpanded
             &&
             <View>
-            <FlatList
-                data={data.comments || []}
-                keyExtractor={(_, index) => `comment_${index}`}
-                renderItem={renderComments}
-            />
-            <View>
-                <TextField onChange={setComment} />
-                <Button
-                    color="white"
-                    backgroundColor="lightBlue"
-                    onPress={postComment(comment, data.id)}
-                >
-                    Post
-                </Button>
+                <FlatList
+                    data={data.comments || []}
+                    keyExtractor={(_, index) => `comment_${index}`}
+                    renderItem={renderComments}
+                />
+                <View style={{ flexDirection: 'row', alignItems: 'center' }} >
+                    <TextField
+                        style={{ flex: 1 }}
+                        value={comment}
+                        placeholder="Add a comment..."
+                        onChange={setComment} />
+                    <TouchableOpacity style={{
+                        borderColor: "#498d93",
+                        flex: 0,
+                        borderRadius: 25,
+                        borderWidth: 1,
+                        padding: 10,
+                        marginStart: 5
+                    }}
+                    onPress={() => {
+                        if(comment.length) {
+                            postComment(comment, data.id)
+                            setComment('')
+                        }
+                    }}
+                    >
+                        <Image
+                            source={send}
+                            style={{ height: 20, width: 20, tintColor: "#498d93" }} />
+                    </TouchableOpacity>
+
+                </View>
             </View>
-            </View>
-            }
+        }
     </View>
 }
 
 const styles = StyleSheet.create({
     profilePicture: {
-        borderRadius: 10,
-        height: 30,
-        width: 30
+        borderRadius: 550,
+        height: 50,
+        width: 50
+    },
+    postProfileBanner: {
+        flexDirection: "row",
+        marginBottom: 10,
+        alignItems: 'center'
     },
     reaction: {
         flexDirection: "row",
         justifyContent: "space-between"
     },
     reactionContainer: {
+        marginTop: 8,
         flexDirection: "row",
-        justifyContent: "space-between"
+        justifyContent: "space-between",
+        marginHorizontal: 15
     },
     reactionIcon: {
-        height: 15,
-        width: 15
+        height: 20,
+        width: 20,
+        marginEnd: 10
+    },
+    description: {
+        marginTop: 8,
+        color: "black",
+        fontSize: 15,
+    },
+    topUsername: {
+        color: "black",
+        fontSize: 21,
+        fontWeight: "900",
+        marginStart: 10
     },
     selfReactionLabel: {
-        fontSize: 20,
+        marginTop: 8,
+        color: "black",
+        fontSize: 15,
         fontWeight: "600"
     },
     image: {
-        height: "auto",
         width: "100%",
+        height: 200,
         borderRadius: 5
     },
     commentRoot: {
         padding: 10,
-        backgroundColor: "gray",
-        borderRadius: 5
+        backgroundColor: "#bedbff",
+        borderWidth: 1,
+        borderColor: '#63bdff',
+        borderRadius: 5,
+        marginVertical: 7
+    },
+    commentSectionExpandButton: {
+        borderColor: 1,
+        borderWidth: 1
     },
     commentProfile: {
         flexDirection: "row",
-        justifyContent: "space-between"
+        justifyContent: "flex-start",
+        alignItems: 'center'
     },
     commentProfileImage: {
         borderRadius: 10,
-        width: 20,
-        height: 20
+        marginEnd: 10,
+        width: 30,
+        height: 30
     },
     root: {
         padding: 10,

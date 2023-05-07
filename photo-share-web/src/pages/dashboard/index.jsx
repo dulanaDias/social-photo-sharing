@@ -1,11 +1,9 @@
 import logoutIcon from '../dashboard/assets/logout.png'
-import profileSettings from '../dashboard/assets/profileSettings.png'
 import blankProfile from '../dashboard/assets/blankProfile.webp'
 import EditableField from './components/EditableField'
 import Post from './components/Post'
 import { useEffect, useState } from 'react'
 import Network from '../../network'
-import { useNavigate } from 'react-router-dom'
 import network from '../../network'
 
 const styles = {
@@ -35,7 +33,6 @@ const styles = {
 
 function Dashboard() {
 
-    const navigate = useNavigate()
     const [captureDescription, setCaptureDescription] = useState(false)
     const [description, setDescription] = useState("")
     const [posts, setPosts] = useState([])
@@ -55,7 +52,7 @@ function Dashboard() {
 
     const logout = () => {
         localStorage.clear()
-        navigate('/auth')
+        window.location.href = "/auth"
     }
 
     useEffect(() => {

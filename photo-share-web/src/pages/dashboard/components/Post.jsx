@@ -1,4 +1,3 @@
-import sample from '../assets/sample.jpeg'
 import likeIcon from '../assets/like.png'
 import dislikeIcon from '../assets/dislike.png'
 import heartIcon from '../assets/heart.png'

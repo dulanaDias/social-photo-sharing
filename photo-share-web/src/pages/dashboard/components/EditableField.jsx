@@ -43,22 +43,28 @@ export default ({ value, setvalue, isPassword = false }) => {
         <div
             className='col-3'
         >
-            {isEdit && <img
-                src={cancelIcon}
-                style={{
-                    height: 20,
-                    width: 20
-                }}
-                onClick={cancelEdit}
-            />}
+            <div
+                className='d-flex align-items-center'
+            >
             <img
                 src={isEdit ? doneIcon : editIcon}
+                className="ms-2 mb-0"
                 style={{
                     height: 20,
                     width: 20
                 }}
                 onClick={toggleEditMode}
             />
+            {isEdit && <img
+                src={cancelIcon}
+                className="ms-3 mt-0"
+                style={{
+                    height: 20,
+                    width: 20
+                }}
+                onClick={cancelEdit}
+            />}
+            </div>
         </div>
 
     </div>

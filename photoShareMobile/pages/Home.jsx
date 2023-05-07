@@ -11,14 +11,19 @@ export default ({ navigation }) => {
     useEffect(() => {
         console.log("home page loaded")
         refreshPosts()
-    }, [])
+    }, [])  
 
     const loadComments = async (postId) => {
+        console.log('i am called')
+        console.log({ postId })
         const comments = await Network.get(`photo/${postId}/comment`)
         if(comments.data.success) {
             const index = posts.findIndex((post) => post.id == postId)
+            console.log('found index ' + index)
             posts[index].comments = comments.data.comments
             setPosts([...posts])
+        } else {
+            console.log('oopps nope')
         }
     }
 
@@ -78,6 +83,7 @@ export default ({ navigation }) => {
 
 const styles = StyleSheet.create({
     root: {
-        height: "100%"
+        height: "100%",
+        backgroundColor: "#acb5b9"
     }
 })

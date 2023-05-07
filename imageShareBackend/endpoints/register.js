@@ -6,17 +6,17 @@ const { includeStringFields } = require('../utils')
 
 router.post('/', async (req, res) => {
     if(!includeStringFields(['name', 'email', 'password'], req.body)) {
-        return res.status(400).json({
+        return res.json({
             success: false,
-            message: "profile basic details are missing"
+            message: "Mandatory fields are missing"
         })
     }
     const { name, email, password } = req.body
     
     if(await User.findOne({ email })) {
-        return res.status(400).json({
+        return res.json({
             success: false,
-            code: "USER_ALEADY_EXISTS" 
+            message: "User already exists with given email address" 
         })
     }
     const newUser = await new User({

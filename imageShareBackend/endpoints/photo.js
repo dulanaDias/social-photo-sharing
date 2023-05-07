@@ -40,8 +40,8 @@ router.get('/', async (req, res) => {
         funny: value.funny.length,
         description: value.description,
         profile: {
-            image: getProfilePicture(value.postedBy.id),
-            username: value.postedBy.name
+            image: getProfilePicture(value.postedBy?.id),
+            username: value.postedBy?.name || 'anonymous'
         }
     }))
     
@@ -91,8 +91,8 @@ router.get('/:photoId/comment/', async (req, res) => {
     const photoWithComments = await Photo.findById(photoId).populate('comments.user')
     const comments = photoWithComments.comments.map(rawComment => ({
         profile: {
-            picture: getProfilePicture(rawComment.user.id),
-            name: rawComment.user.name
+            picture: getProfilePicture(rawComment.user?.id),
+            name: rawComment.user?.name || 'anonymous'
         },
         body: rawComment.comment
     }))
@@ -112,8 +112,8 @@ router.post('/:photoId/comment/', async (req, res) => {
     ).populate('comments.user')
     const comments = updatedData.comments.map(rawComment => ({
         profile: {
-            picture: getProfilePicture(rawComment.user.id),
-            name: rawComment.user.name
+            picture: getProfilePicture(rawComment.user?.id),
+            name: rawComment.user?.name || 'anonymous'
         },
         body: rawComment.comment
     }))
