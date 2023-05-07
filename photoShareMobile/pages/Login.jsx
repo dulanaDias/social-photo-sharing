@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     SafeAreaView,
     ScrollView,
@@ -11,15 +11,63 @@ import {
     View,
 } from 'react-native';
 import { Header } from 'react-native/Libraries/NewAppScreen';
-import Button from './components/Button';
+import Button from '../components/Button';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import TextField from '../components/TextField';
+import Network from '../Network';
 
-function Login() {
+function Login({ navigation }) {
     const [isLogin, setIsLogin] = useState(true)
     const [details, setDetails] = useState({
         name: '',
         password: '',
         email: ''
     })
+
+    useEffect(() => {
+        AsyncStorage.getItem("authToken").then((value) => {
+            if(value) navigation.navigate("home")
+        })
+    }, [])
+
+    const onButtonPress = async () => {
+        if(isLogin) {
+          const result = await Network.post('login', {
+            email: details.email,
+            password: details.password
+          })
+
+          if(result.data.success) {
+            AsyncStorage.setItem('authToken', result.data.token)
+            navigation.navigate("home")
+          } else {
+            
+            console.log(result.data)
+          }
+        } else {
+          
+          const result = await Network.post('register', {
+            email: details.email,
+            password: details.password,
+            name: details.username
+          })
+          if(result.data.success) {
+            AsyncStorage.setItem('authToken', result.data.token)
+            navigation.navigate("home")
+          } else {
+            console.log(result.data)
+          }
+        }
+      }
+
+    const onValueChange = (name) => {
+        return (text) => {
+            setDetails({
+                ...details,
+                [name]: text
+            })
+        }
+    }
 
     return (
         <SafeAreaView>
@@ -28,17 +76,23 @@ function Login() {
                     {isLogin ? "Login" : "Register"}
                 </Text>
                 <View style={styles.form}>
-                    {!isLogin && <TextInput 
+                    {!isLogin && <TextField                     
                         value={details.name}
-                        placeholder='UserName' style={styles.inputField}/>}
-                    <TextInput 
+                        onChange={onValueChange('name')}
+                        placeholder='UserName'
+                    />}
+                    <TextField 
+                        onChange={onValueChange('email')}
                         value={details.email}
-                        placeholder='Email' style={styles.inputField}/>
-                    <TextInput 
+                        placeholder='Email'
+                    />
+                    <TextField 
+                        onChange={onValueChange('password')}
                         value={details.password}
-                        placeholder='Password' style={styles.inputField}/>
+                        placeholder='Password'
+                    />
                     
-                    <Button backgroundColor="orange">Login</Button>
+                    <Button backgroundColor="orange" onPress={onButtonPress} >Login</Button>
                      
                     <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'center' }}>
                     <Text>{isLogin ? "Don't have an accont? " : "Already have an account? "}</Text>

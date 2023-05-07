@@ -20,11 +20,12 @@ export default ({ data, setReaction, loadComments, postComment }) => {
 
     const react = (reactionType) => {
         return () => {
-            if (data.selfReaction == "none" || reactionType == data.selfReaction)
+            if (data.selfReaction == "none" || reactionType == data.selfReaction) {
                 if (data.selfReaction == "none")
                     setReaction(reactionType, true, data.id)
                 else
                     setReaction(reactionType, false, data.id)
+            }
         }
     }
 
