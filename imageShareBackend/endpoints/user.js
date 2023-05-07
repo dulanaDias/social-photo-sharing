@@ -28,15 +28,17 @@ router.put('/profile', async (req, res) => {
         })
     }
 
-    // check if user already with given name and email
-    if (updateInfo.email
-        && await User.findOne({ email: updateInfo.email })) {
-        return res.status(400).json({
-            success: false,
-            message: "user already exist with provide email or name",
-            code: "USER_ALEADY_EXISTS" 
-        })
+    if(updateInfo.email) {
+        const foundUser = await User.findOne({ email: updateInfo.email })
+        if(foundUser && req.user.id != foundUser.id) { // another user with same email
+            return res.status(400).json({
+                success: false,
+                message: "user already exist with provide email or name",
+                code: "USER_ALEADY_EXISTS" 
+            })
+        }
     }
+    
     if(updateInfo.password) {
         updateInfo.password = bcrypt.hashSync(updateInfo.password, 1)
     }
@@ -47,7 +49,7 @@ router.put('/profile', async (req, res) => {
     const profile = {
         name: data.name,
         email: data.email,
-        profilePicture: fs.readFileSync(`profileImages/${data._id}`).toString('utf8')
+        profilePicture: getProfilePicture(data._id)
     }
 
     return res.json({

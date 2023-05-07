@@ -1,6 +1,6 @@
 import React from "react"
 import { StyleSheet, TextInput } from 'react-native'
-export default ({onChange, placeholder, value, style = {}}, password = false) => {
+export default ({onChange, placeholder, password = false, value, style = {}}) => {
     return <TextInput
         placeholder={placeholder}
         value={value}
