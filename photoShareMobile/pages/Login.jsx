@@ -23,12 +23,20 @@ function Login({ navigation }) {
         password: '',
         email: ''
     })
+    const [alertMessage, setAlertMessage] = useState("")
 
     useEffect(() => {
         AsyncStorage.getItem("authToken").then((value) => {
-            if(value) navigation.navigate("home")
+            if(value) navigation.replace("home")
         })
     }, [])
+
+    const displayAlert = (message) => {
+        setAlertMessage(message),
+        setTimeout(() => {
+            setAlertMessage("")
+        }, 3500)
+    }
 
     const onButtonPress = async () => {
         if(isLogin) {
@@ -39,10 +47,9 @@ function Login({ navigation }) {
 
           if(result.data.success) {
             AsyncStorage.setItem('authToken', result.data.token)
-            navigation.navigate("home")
+            navigation.replace("home")
           } else {
-            
-            console.log(result.data)
+            displayAlert(result.data.message)
           }
         } else {
           
@@ -53,9 +60,9 @@ function Login({ navigation }) {
           })
           if(result.data.success) {
             AsyncStorage.setItem('authToken', result.data.token)
-            navigation.navigate("home")
+            navigation.replace("home")
           } else {
-            console.log(result.data)
+            displayAlert(result.data.message)
           }
         }
       }
@@ -93,7 +100,7 @@ function Login({ navigation }) {
                     />
                     
                     <Button backgroundColor="orange" onPress={onButtonPress} >Login</Button>
-                     
+                    {!!alertMessage && <Text style={styles.warningAlert}>{alertMessage}</Text>}
                     <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'center' }}>
                     <Text>{isLogin ? "Don't have an accont? " : "Already have an account? "}</Text>
                     <TouchableOpacity onPress={() => {setIsLogin(!isLogin)}}>
@@ -115,6 +122,18 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         color: 'white',
         backgroundColor: 'blue'
+    },
+    warningAlert: {
+        padding: 5,
+        marginTop: 5,
+        backgroundColor: "white",
+        borderRadius: 5,
+        color: "#f14730",
+        fontWeight: "800",
+        fontSize: 15,
+        borderColor: "#f1736e",
+        borderWidth: 2,
+        textAlign: "center"
     },
     container: {
         justifyContent: 'center',

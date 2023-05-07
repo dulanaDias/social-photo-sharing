@@ -1,29 +1,17 @@
-import React, { useEffect, useState } from "react"
-import { FlatList, Image, StyleSheet, Text, View, TouchableOpacity } from "react-native"
+import React from "react"
+import { Image, StyleSheet, Text, View, TouchableOpacity } from "react-native"
 import blankProfile from '../assets/blankProfile.png'
 import like from '../assets/like.png'
 import dislike from '../assets/dislike.png'
 import love from '../assets/heart.png'
 import funny from '../assets/laugh.png'
-import send from '../assets/send.png'
 import Button from "./Button"
-import TextField from './TextField'
-
-const Comment = ({ data }) => {
-    return <View style={styles.commentRoot}>
-        <View style={styles.commentProfile}>
-            <Image
-                style={styles.commentProfileImage}
-                source={data.profile.picture ? { uri: data.profile.picture } : blankProfile} />
-            <Text style={{ fontWeight: "800" }}>{data.profile.name}</Text>
-        </View>
-        <Text>{data.body}</Text>
-    </View>
-}
-
-export default ({ data, setReaction, loadComments, postComment }) => {
-    const [commentsExpanded, setCommentsExpanded] = useState(false)
-    const [comment, setComment] = useState("")
+import { useNavigation } from "@react-navigation/native"
+export default ({ data, setReaction }) => {
+    const navigation = useNavigation()
+    const openComments = () => {
+        navigation.navigate("comments", { postId: data.id })
+    }
 
     const react = (reactionType) => {
         return () => {
@@ -34,16 +22,6 @@ export default ({ data, setReaction, loadComments, postComment }) => {
                     setReaction(reactionType, false, data.id)
             }
         }
-    }
-
-    useEffect(() => {
-        if (commentsExpanded) {
-            loadComments(data.id)
-        }
-    }, [commentsExpanded])
-
-    const renderComments = ({ item }) => {
-        return <Comment data={item} />
     }
 
     return <View style={styles.root}>
@@ -79,47 +57,10 @@ export default ({ data, setReaction, loadComments, postComment }) => {
         </View>
         <Button
             color="black"
-            style={styles.commentSectionExpandButton}
-            onPress={() => { setCommentsExpanded(!commentsExpanded) }}>
+            style={styles.commentSectionButton}
+            onPress={openComments}>
             View Comments
         </Button>
-        {commentsExpanded
-            &&
-            <View>
-                <FlatList
-                    data={data.comments || []}
-                    keyExtractor={(_, index) => `comment_${index}`}
-                    renderItem={renderComments}
-                />
-                <View style={{ flexDirection: 'row', alignItems: 'center' }} >
-                    <TextField
-                        style={{ flex: 1 }}
-                        value={comment}
-                        placeholder="Add a comment..."
-                        onChange={setComment} />
-                    <TouchableOpacity style={{
-                        borderColor: "#498d93",
-                        flex: 0,
-                        borderRadius: 25,
-                        borderWidth: 1,
-                        padding: 10,
-                        marginStart: 5
-                    }}
-                    onPress={() => {
-                        if(comment.length) {
-                            postComment(comment, data.id)
-                            setComment('')
-                        }
-                    }}
-                    >
-                        <Image
-                            source={send}
-                            style={{ height: 20, width: 20, tintColor: "#498d93" }} />
-                    </TouchableOpacity>
-
-                </View>
-            </View>
-        }
     </View>
 }
 
@@ -171,28 +112,9 @@ const styles = StyleSheet.create({
         height: 200,
         borderRadius: 5
     },
-    commentRoot: {
-        padding: 10,
-        backgroundColor: "#bedbff",
-        borderWidth: 1,
-        borderColor: '#63bdff',
-        borderRadius: 5,
-        marginVertical: 7
-    },
-    commentSectionExpandButton: {
+    commentSectionButton: {
         borderColor: 1,
         borderWidth: 1
-    },
-    commentProfile: {
-        flexDirection: "row",
-        justifyContent: "flex-start",
-        alignItems: 'center'
-    },
-    commentProfileImage: {
-        borderRadius: 10,
-        marginEnd: 10,
-        width: 30,
-        height: 30
     },
     root: {
         padding: 10,

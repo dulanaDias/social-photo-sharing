@@ -8,7 +8,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export default ({ navigation }) => {
     const logout = () => {
         AsyncStorage.clear()
-        navigation.navigate("auth")
+        navigation.replace("auth")
     }
     return <View style={{
         justifyContent: "flex-end",

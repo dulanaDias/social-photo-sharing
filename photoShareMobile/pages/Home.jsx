@@ -9,23 +9,8 @@ export default ({ navigation }) => {
     const [posts, setPosts] = useState([])
 
     useEffect(() => {
-        console.log("home page loaded")
         refreshPosts()
     }, [])  
-
-    const loadComments = async (postId) => {
-        console.log('i am called')
-        console.log({ postId })
-        const comments = await Network.get(`photo/${postId}/comment`)
-        if(comments.data.success) {
-            const index = posts.findIndex((post) => post.id == postId)
-            console.log('found index ' + index)
-            posts[index].comments = comments.data.comments
-            setPosts([...posts])
-        } else {
-            console.log('oopps nope')
-        }
-    }
 
     const onReacted = async (reactionType, didReacted, id) => {
         const result = await Network.put('photo/react', { type: reactionType, reacted: didReacted, id })
@@ -50,23 +35,10 @@ export default ({ navigation }) => {
         }
     }
 
-    const addComment = async (comment, postId) => {
-        const comments = await Network.post(`photo/${postId}/comment`, {
-            comment
-        })
-        if(comments.data.success) {
-            const index = posts.findIndex((post) => post.id == postId)
-            
-            posts[index].comments = comments.data.comments
-            setPosts([...posts])
-        }
-    }
     // index, item, seperators
     const renderPost = ({ item }) => {
         return <Post
             data={item}
-            loadComments={loadComments}
-            postComment={addComment}
             setReaction={onReacted}
         />
     }

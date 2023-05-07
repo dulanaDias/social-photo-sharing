@@ -7,7 +7,7 @@ router.post('/', async (req, res) => {
     const base64Content = req.body.image
     const description = req.body.description || "No description"
     const sourceId = `${req.user.id}-${Date.now().toString()}`
-    fs.writeFile(`images/${sourceId}`, base64Content)
+    fs.writeFileSync(`images/${sourceId}`, base64Content)
     const newImage = await new Photo({ sourceId, postedBy: req.user.id, description }).save()
     return res.json({
         success: true,

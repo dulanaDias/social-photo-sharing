@@ -115,7 +115,10 @@ export default ({ data, setReaction, loadComments, postComment }) => {
                     />
                     <button 
                         className='btn btn-primary ms-1'
-                        onClick={() => { postComment(comment, data.id) }}
+                        onClick={() => { 
+                            postComment(comment, data.id)
+                            setComment("")
+                        }}
                     >
                         Post
                     </button>

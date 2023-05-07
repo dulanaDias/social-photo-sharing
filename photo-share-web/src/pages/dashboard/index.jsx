@@ -80,6 +80,7 @@ function Dashboard() {
     }
 
     const addComment = async (comment, postId) => {
+        if(!comment) return
         const comments = await network.post(`photo/${postId}/comment`, {
             comment
         })
