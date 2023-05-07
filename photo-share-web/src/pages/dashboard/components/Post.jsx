@@ -2,6 +2,7 @@ import likeIcon from '../assets/like.png'
 import dislikeIcon from '../assets/dislike.png'
 import heartIcon from '../assets/heart.png'
 import laughIcon from '../assets/laugh.png'
+import deleteIcon from '../assets/cancel.png'
 import { useEffect, useState } from 'react'
 import Comment from './Comment'
 
@@ -10,10 +11,15 @@ const styles = {
         height: 15,
         width: 15,
         marginRight: 10
+    },
+    delete: {
+        height: 15,
+        width: 15,
+        marginRight: 10
     }
 }
 
-export default ({ data, setReaction, loadComments, postComment }) => {
+export default ({ data, setReaction, loadComments, postComment, deletePost }) => {
     const [commentsVisible, setCommentsVisible] = useState(false)
     const [comment, setComment] = useState("")
 
@@ -32,26 +38,33 @@ export default ({ data, setReaction, loadComments, postComment }) => {
         if (commentsVisible)
             loadComments(data.id)
     }, [commentsVisible])
-    
+
     return <div className='mt-3 ms-2 me-2 row'>
-        <div class="card ps-0 pe-0" style={{ width: "50%" }}>
+        <div className="card ps-0 pe-0" style={{ width: "50%" }}>
+            {data.isSelf && <div className="d-flex justify-content-end">
+                <img
+                    src={deleteIcon}
+                    onClick={() => { deletePost(data.id) }}
+                    class="m-2" style={styles.delete} />
+            </div>}
             <img src={data.image} class="card-img-top" alt="..." />
+
             <div class="card-body">
-                
+
                 <div style={{ position: 'relative', marginBottom: "45px" }}>
-                <div className="d-flex align-items-center position-absolute" style={{ top: "-45px" }}>
-                <img 
-                    src={data.profile.image} 
-                    style={{ 
-                        width: 90, 
-                        height: 90, 
-                        borderRadius: '50%'
-                    }} 
-                />
-                <h5 class="card-title ms-2" >{data.profile.username}</h5>
+                    <div className="d-flex align-items-center position-absolute" style={{ top: "-45px" }}>
+                        <img
+                            src={data.profile.image}
+                            style={{
+                                width: 90,
+                                height: 90,
+                                borderRadius: '50%'
+                            }}
+                        />
+                        <h5 class="card-title ms-2" >{data.profile.username}</h5>
                     </div>
                 </div>
-                
+
                 <p class="card-text">{data.description}</p>
                 {data.selfReaction != "none" && <span className='row'>{`You have reacted on this post with ${data.selfReaction}`}</span>}
                 <div className="row">
@@ -84,7 +97,7 @@ export default ({ data, setReaction, loadComments, postComment }) => {
                         <span>{data.funny}</span>
                     </button>
                 </div>
-                
+
                 <button
                     class={`btn btn-${commentsVisible ? 'danger' : 'primary'}`}
                     onClick={() => {
@@ -102,7 +115,7 @@ export default ({ data, setReaction, loadComments, postComment }) => {
                 <div className="row"
                     style={{ overflow: 'scroll', maxHeight: '60vh' }}
                 >
-                    {(data.comments || []).map((comment, index) => 
+                    {(data.comments || []).map((comment, index) =>
                         <Comment key={`comment-key-${index}`} data={comment} />
                     )}
                 </div>
@@ -113,9 +126,9 @@ export default ({ data, setReaction, loadComments, postComment }) => {
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
                     />
-                    <button 
+                    <button
                         className='btn btn-primary ms-1'
-                        onClick={() => { 
+                        onClick={() => {
                             postComment(comment, data.id)
                             setComment("")
                         }}

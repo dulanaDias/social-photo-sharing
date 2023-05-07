@@ -16,6 +16,13 @@ router.post('/', async (req, res) => {
     })
 })
 
+router.delete("/:id", async (req, res) => {
+    await Photo.findByIdAndDelete(req.params.id)
+    return res.json({
+        success: true
+    })
+})
+
 const getSelfReaction = (req, data) => {
     const reactions = ['like', 'dislike', 'love', 'funny']
     for(const reaction of reactions) {
@@ -33,6 +40,7 @@ router.get('/', async (req, res) => {
     const data = photos.map((value) => ({
         id: value.id,
         image: fs.readFileSync(`images/${value.sourceId}`).toString('utf-8'),
+        isSelf: value.postedBy?.id == req.user.id,
         selfReaction: getSelfReaction(req, value),
         like: value.like.length,
         dislike: value.dislike.length,

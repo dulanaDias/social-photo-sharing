@@ -163,6 +163,13 @@ function Dashboard() {
         }
     }
 
+    const deletePost = async (postId) => {
+        const result = await Network.delete(`photo/${postId}`)
+        if(result.data.success) {
+            refreshPosts()
+        }
+    }
+
     return <div className="Dashboard">
 
         <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -256,6 +263,7 @@ function Dashboard() {
                             setReaction={onReacted}
                             loadComments={loadComments}
                             postComment={addComment}
+                            deletePost={deletePost}
                         />)
                 }
 

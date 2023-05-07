@@ -6,8 +6,10 @@ import dislike from '../assets/dislike.png'
 import love from '../assets/heart.png'
 import funny from '../assets/laugh.png'
 import Button from "./Button"
+import deleteIcon from "../assets/cancel.png"
+
 import { useNavigation } from "@react-navigation/native"
-export default ({ data, setReaction }) => {
+export default ({ data, setReaction, deletePost }) => {
     const navigation = useNavigation()
     const openComments = () => {
         navigation.navigate("comments", { postId: data.id })
@@ -25,6 +27,14 @@ export default ({ data, setReaction }) => {
     }
 
     return <View style={styles.root}>
+        {data.isSelf && <View style={{ padding: 5, flexDirection: "row", justifyContent: "flex-end", marginBottom: 10 }}>
+        <TouchableOpacity onPress={() => {
+            deletePost(data.id)
+        }}>
+            <Image source={deleteIcon} style={{ height: 15, width: 15 }} />
+        </TouchableOpacity>
+        </View>}
+        
         <View style={styles.postProfileBanner}>
             <Image
                 source={data.profile.image ? { uri: data.profile.image } : blankProfile}

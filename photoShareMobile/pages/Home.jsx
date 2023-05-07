@@ -35,10 +35,17 @@ export default ({ navigation }) => {
         }
     }
 
+    const deletePost = async (postId) => {
+        const result = await Network.delete(`photo/${postId}`)
+        if(result.data.success) {
+            refreshPosts()
+        }
+    }
     // index, item, seperators
     const renderPost = ({ item }) => {
         return <Post
             data={item}
+            deletePost={deletePost}
             setReaction={onReacted}
         />
     }
