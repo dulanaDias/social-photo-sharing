@@ -3,8 +3,7 @@ import blankProfile from '../dashboard/assets/blankProfile.webp'
 import EditableField from './components/EditableField'
 import Post from './components/Post'
 import { useEffect, useState } from 'react'
-import Network from '../../network'
-import network from '../../network'
+import Network from '../../Network'
 
 const styles = {
     icon: {
@@ -81,7 +80,7 @@ function Dashboard() {
 
     const addComment = async (comment, postId) => {
         if(!comment) return
-        const comments = await network.post(`photo/${postId}/comment`, {
+        const comments = await Network.post(`photo/${postId}/comment`, {
             comment
         })
         if(comments.data.success) {
@@ -171,24 +170,6 @@ function Dashboard() {
     }
 
     return <div className="Dashboard">
-
-        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        ...
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Understood</button>
-                    </div>
-                </div>
-            </div>
-        </div>
         <nav class="navbar navbar-expand-lg navbar-light" style={{
             backgroundImage: 'linear-gradient(to left top, #8e00ff, #00ffdb)'
         }}>
@@ -223,7 +204,7 @@ function Dashboard() {
                             <EditableField value={userInfo.email} setvalue={onProfileChange('email')} />
                             <EditableField value={userInfo.password} isPassword setvalue={onProfileChange('password')} />
 
-                            {captureDescription && <div className='mt-3 row'>
+                            {captureDescription && <div className='my-3 row'>
                                 <label class="form-label">Tell something photo</label>
                                 <textarea class="form-control" value={description}
                                     onChange={
@@ -243,7 +224,7 @@ function Dashboard() {
                                 </button>
                                 {captureDescription && <button
                                     onClick={cancelPhotoPost}
-                                    className='btn btn-danger' >
+                                    className='mt-3 btn btn-danger' >
                                     Cancel
                                 </button>}
                             </div>

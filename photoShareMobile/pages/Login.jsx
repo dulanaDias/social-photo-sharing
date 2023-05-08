@@ -14,58 +14,63 @@ import { Header } from 'react-native/Libraries/NewAppScreen';
 import Button from '../components/Button';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import TextField from '../components/TextField';
-import Network from '../Network';
+import Network, { networkNavigation } from '../Network';
+
+const DEFUALT_DETAILS = {
+    name: '',
+    password: '',
+    email: ''
+}
 
 function Login({ navigation }) {
     const [isLogin, setIsLogin] = useState(true)
-    const [details, setDetails] = useState({
-        name: '',
-        password: '',
-        email: ''
-    })
+    const [details, setDetails] = useState(DEFUALT_DETAILS)
     const [alertMessage, setAlertMessage] = useState("")
+    const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
+        networkNavigation.navigate = navigation.navigate
         AsyncStorage.getItem("authToken").then((value) => {
-            if(value) navigation.replace("home")
+            if (value) navigation.replace("home")
+            else setIsLoading(false)
         })
     }, [])
 
     const displayAlert = (message) => {
         setAlertMessage(message),
-        setTimeout(() => {
-            setAlertMessage("")
-        }, 3500)
+            setTimeout(() => {
+                setAlertMessage("")
+            }, 3500)
     }
 
     const onButtonPress = async () => {
-        if(isLogin) {
-          const result = await Network.post('login', {
-            email: details.email,
-            password: details.password
-          })
+        if (isLogin) {
+            const result = await Network.post('login', {
+                email: details.email,
+                password: details.password
+            })
 
-          if(result.data.success) {
-            AsyncStorage.setItem('authToken', result.data.token)
-            navigation.replace("home")
-          } else {
-            displayAlert(result.data.message)
-          }
+            if (result.data.success) {
+                AsyncStorage.setItem('authToken', result.data.token)
+                navigation.replace("home")
+            } else {
+                displayAlert(result.data.message)
+            }
         } else {
-          
-          const result = await Network.post('register', {
-            email: details.email,
-            password: details.password,
-            name: details.username
-          })
-          if(result.data.success) {
-            AsyncStorage.setItem('authToken', result.data.token)
-            navigation.replace("home")
-          } else {
-            displayAlert(result.data.message)
-          }
+
+            const result = await Network.post('register', {
+                email: details.email,
+                password: details.password,
+                name: details.name
+            })
+            if (result.data.success) {
+                AsyncStorage.setItem('authToken', result.data.token)
+                navigation.replace("home")
+            } else {
+                displayAlert(result.data.message)
+            }
         }
-      }
+    }
 
     const onValueChange = (name) => {
         return (text) => {
@@ -75,7 +80,10 @@ function Login({ navigation }) {
             })
         }
     }
-
+    if (isLoading)
+        return <View style={styles.container} >
+            <Text style={styles.loadingLabel}>Loading...</Text>
+        </View>
     return (
         <SafeAreaView>
             <View style={styles.container} >
@@ -83,31 +91,37 @@ function Login({ navigation }) {
                     {isLogin ? "Login" : "Register"}
                 </Text>
                 <View style={styles.form}>
-                    {!isLogin && <TextField                     
+                    {!isLogin && <TextField
                         value={details.name}
                         onChange={onValueChange('name')}
                         placeholder='UserName'
                     />}
-                    <TextField 
+                    <TextField
                         onChange={onValueChange('email')}
                         value={details.email}
                         placeholder='Email'
                     />
-                    <TextField 
+                    <TextField
                         onChange={onValueChange('password')}
                         value={details.password}
                         placeholder='Password'
+                        password={isLogin}
                     />
-                    
-                    <Button backgroundColor="orange" onPress={onButtonPress} >Login</Button>
+
+                    <Button backgroundColor="orange" onPress={onButtonPress} >{isLogin ? "Login" : "Register"}</Button>
                     {!!alertMessage && <Text style={styles.warningAlert}>{alertMessage}</Text>}
                     <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'center' }}>
-                    <Text>{isLogin ? "Don't have an accont? " : "Already have an account? "}</Text>
-                    <TouchableOpacity onPress={() => {setIsLogin(!isLogin)}}>
-                        <Text style={{ color: "blue", fontWeight: "600" }}>{isLogin ? "Sign Up" : "Login"}</Text>
-                    </TouchableOpacity>
+                        <Text>{isLogin ? "Don't have an accont? " : "Already have an account? "}</Text>
+                        <TouchableOpacity onPress={() => { 
+                            setDetails({
+                                ...DEFUALT_DETAILS
+                            })
+                            setIsLogin(!isLogin)
+                        }}>
+                            <Text style={{ color: "blue", fontWeight: "600" }}>{isLogin ? "Sign Up" : "Login"}</Text>
+                        </TouchableOpacity>
                     </View>
-                    
+
                 </View>
             </View>
         </SafeAreaView>
@@ -174,6 +188,12 @@ const styles = StyleSheet.create({
         marginTop: 8,
         fontSize: 18,
         fontWeight: '400',
+    },
+    loadingLabel: {
+        fontSize: 25,
+        fontWeight: 'bold',
+        textAlign: "center",
+        color: "white"
     },
     highlight: {
         fontWeight: '700',

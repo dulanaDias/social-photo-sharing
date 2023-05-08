@@ -7,7 +7,7 @@ router.post('/', async (req, res) => {
     const base64Content = req.body.image
     const description = req.body.description || "No description"
     const sourceId = `${req.user.id}-${Date.now().toString()}`
-    fs.writeFileSync(`images/${sourceId}`, base64Content)
+    fs.writeFileSync(`storage/images/${sourceId}`, base64Content)
     const newImage = await new Photo({ sourceId, postedBy: req.user.id, description }).save()
     return res.json({
         success: true,
@@ -17,7 +17,8 @@ router.post('/', async (req, res) => {
 })
 
 router.delete("/:id", async (req, res) => {
-    await Photo.findByIdAndDelete(req.params.id)
+    const deletedPhoto = await Photo.findByIdAndDelete(req.params.id)
+    fs.rmSync(`storage/images/${deletedPhoto.sourceId}`)
     return res.json({
         success: true
     })
@@ -39,7 +40,7 @@ router.get('/', async (req, res) => {
     
     const data = photos.map((value) => ({
         id: value.id,
-        image: fs.readFileSync(`images/${value.sourceId}`).toString('utf-8'),
+        image: fs.readFileSync(`storage/images/${value.sourceId}`).toString('utf-8'),
         isSelf: value.postedBy?.id == req.user.id,
         selfReaction: getSelfReaction(req, value),
         like: value.like.length,

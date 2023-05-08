@@ -8,6 +8,7 @@ module.exports = async function authenticate(req, res, next) {
     }
     jwt.verify(jwtToken, process.env.jwtSecret, (err, decodedData) => {
         if (err) return res.status(401).json({
+            code: "TOKEN_EXPIRED",
             message: "unauthorized access, invalid token"
         })
         req.user = { id: decodedData.userId }

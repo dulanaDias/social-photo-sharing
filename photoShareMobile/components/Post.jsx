@@ -1,5 +1,5 @@
 import React from "react"
-import { Image, StyleSheet, Text, View, TouchableOpacity } from "react-native"
+import { Image, StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native"
 import blankProfile from '../assets/blankProfile.png'
 import like from '../assets/like.png'
 import dislike from '../assets/dislike.png'
@@ -26,11 +26,27 @@ export default ({ data, setReaction, deletePost }) => {
         }
     }
 
+    const openDeleteConfirmation = () => {
+        Alert.alert(
+            "Are you sure?",
+            "Are you sure you want to delete this post  ?",
+            [
+                {
+                    text: "No keep",
+                    style: "cancel"
+                },
+                {
+                    text: "Yes delete",
+                    onPress: () => { deletePost(data.id) },
+                    style: "destructive"
+                }
+            ], { cancelable: true }
+            )
+    }
+
     return <View style={styles.root}>
         {data.isSelf && <View style={{ padding: 5, flexDirection: "row", justifyContent: "flex-end", marginBottom: 10 }}>
-        <TouchableOpacity onPress={() => {
-            deletePost(data.id)
-        }}>
+        <TouchableOpacity onPress={openDeleteConfirmation}>
             <Image source={deleteIcon} style={{ height: 15, width: 15 }} />
         </TouchableOpacity>
         </View>}

@@ -3,6 +3,7 @@ import { FlatList, StyleSheet, View, TouchableOpacity, Image, Text } from "react
 import Network from "../Network"
 import TextField from "../components/TextField"
 import send from "../assets/send.png"
+import blankProfile from "../assets/blankProfile.png"
 
 const Comment = ({ data }) => {
     return <View style={styles.commentRoot}>
@@ -50,24 +51,18 @@ export default ({ route }) => {
     return <View style={styles.root}>
         <FlatList
             data={commentList}
+            style={styles.commentList}
             keyExtractor={(_, index) => `comment_${index}`}
             renderItem={renderComments}
             ListEmptyComponent={EmptyBanner}
         />
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }} >
+        <View style={styles.composer} >
             <TextField
                 style={{ flex: 1 }}
                 value={comment}
                 placeholder="Add a comment..."
                 onChange={setComment} />
-            <TouchableOpacity style={{
-                borderColor: "#498d93",
-                flex: 0,
-                borderRadius: 25,
-                borderWidth: 1,
-                padding: 10,
-                marginStart: 5
-            }}
+            <TouchableOpacity style={styles.submit}
                 onPress={postComment}
             >
                 <Image
@@ -83,6 +78,18 @@ const styles = StyleSheet.create({
     root: {
         padding: 10,
         height: "100%"
+    },
+    composer: {
+        flexDirection: 'row', alignItems: 'center', marginTop: 10, flex: 0
+    },
+    commentList: { flex: 1 },
+    submit: {
+        borderColor: "#498d93",
+        flex: 0,
+        borderRadius: 25,
+        borderWidth: 1,
+        padding: 10,
+        marginStart: 5
     },
     emptyBanner: {textAlign: "center", margin: 20, color: "black", fontSize: 20},
     commentProfile: {

@@ -2,17 +2,19 @@ import logo from './logo.svg';
 import './App.css';
 import background from './login-background.jpg'
 import { useState } from 'react';
-import network from '../../network';
+import Network from '../../Network';
+
+const DEFUALT_DETAILS = {
+  email: '',
+  password: '',
+  username: ''
+}
 
 function Login() {
   const [isLogin, setIsLogin] = useState(true)
   const [alertMessage, setAlertMessage] = useState('')
 
-  const [details, setDetails] = useState({
-    email: '',
-    password: '',
-    username: ''
-  })
+  const [details, setDetails] = useState(DEFUALT_DETAILS)
 
 
   const onChange = (event) => {
@@ -30,7 +32,7 @@ function Login() {
 
   const onButtonPress = async () => {
     if (isLogin) {
-      const result = await network.post('login', {
+      const result = await Network.post('login', {
         email: details.email,
         password: details.password
       })
@@ -42,7 +44,7 @@ function Login() {
       }
     } else {
 
-      const result = await network.post('register', {
+      const result = await Network.post('register', {
         email: details.email,
         password: details.password,
         name: details.username
@@ -101,7 +103,6 @@ function Login() {
       </div>
       <div class="mb-3">
         <input
-          type="password"
           class="form-control p-3"
           name='password'
           value={details.password}
@@ -140,6 +141,7 @@ function Login() {
             <p>{isLogin ? "Don't have a account ? " : "Already have an accont ? "}<span
               onClick={() => {
                 setIsLogin(!isLogin)
+                setDetails({ ...DEFUALT_DETAILS })
               }} className='link-primary fw-bold'>{isLogin ? "Sign Up" : "Login"}</span></p>
           </div>
         </div>

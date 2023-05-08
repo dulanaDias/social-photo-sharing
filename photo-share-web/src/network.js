@@ -1,6 +1,16 @@
 import axios from 'axios'
 const baseUrl = process.env.REACT_APP_API_URL
 
+axios.interceptors.response.use((response) => response,
+ (err) => {
+    console.log(err)
+    if(err.response && err.response.status == 401 && 
+        err.response.data.code == "TOKEN_EXPIRED"
+    ) {
+        localStorage.clear()
+        window.location.href = "/auth?tokenExpired=true"
+    }
+})
 export default {
     post: async (endpoint, data) => {
         const tokenKey = localStorage.getItem('authToken')

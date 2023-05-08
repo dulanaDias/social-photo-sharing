@@ -43,7 +43,7 @@ router.put('/profile', async (req, res) => {
         updateInfo.password = bcrypt.hashSync(updateInfo.password, 1)
     }
     if(updateInfo.profilePicture) 
-        fs.writeFileSync(`profileImages/${req.user.id}`, updateInfo.profilePicture)
+        fs.writeFileSync(`storage/profileImages/${req.user.id}`, updateInfo.profilePicture)
     const data = await User.findByIdAndUpdate(req.user.id, updateInfo, { returnOriginal: false })
 
     const profile = {

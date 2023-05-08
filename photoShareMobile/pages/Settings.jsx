@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import TextField from "../components/TextField";
 import Network from "../Network";
 import blankProfile from '../assets/blankProfile.png'
@@ -48,9 +48,16 @@ export default () => {
         }
     }
 
+    const alert = () => {
+        Alert.alert("Profile Updated", "Your profile has updated successfully")
+    }
+
     const setNewPassword = () => {
         Network.put("user/profile", { password }).then((result) => {
-            if(result.success) setPassword("")
+            if(result.data.success) {
+                setPassword("")
+                alert()
+            }
         })
     }
 
@@ -63,6 +70,7 @@ export default () => {
             setDetails({
                 ...updatedData.data.profile
             })
+            alert()
         }
         
     }

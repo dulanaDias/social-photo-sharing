@@ -28,7 +28,6 @@ export default ({ value, setvalue, isPassword = false }) => {
     return <div className="row">
         {isEdit ? <input
             value={inputValue}
-            type={isPassword ? "password" : "text"}
             onChange={(e) => {
                 setInputValue(e.target.value)
             }}
@@ -48,7 +47,7 @@ export default ({ value, setvalue, isPassword = false }) => {
             >
             <img
                 src={isEdit ? doneIcon : editIcon}
-                className="ms-2 mb-0"
+                className="ms-2"
                 style={{
                     height: 20,
                     width: 20
@@ -57,7 +56,7 @@ export default ({ value, setvalue, isPassword = false }) => {
             />
             {isEdit && <img
                 src={cancelIcon}
-                className="ms-3 mt-0"
+                className="ms-3"
                 style={{
                     height: 20,
                     width: 20

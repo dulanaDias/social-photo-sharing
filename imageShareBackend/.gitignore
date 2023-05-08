@@ -1,4 +1,4 @@
 node_modules
-profileImages
-images
+storage/profileImages
+storage/images
 .env

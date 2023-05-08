@@ -5,6 +5,7 @@ import Network from "../Network";
 import blankPost from '../assets/blankPost.png'
 import Button from "../components/Button";
 import { launchImageLibrary } from "react-native-image-picker"
+import MultilineField from "../components/MultilineField";
 
 export default ({navigation}) => {
     const [image, setImage] = useState('')
@@ -27,7 +28,7 @@ export default ({navigation}) => {
             image,
             description
         })
-        navigation.pop()
+        navigation.replace("home")
     }
 
     return <View style={styles.root}>
@@ -38,8 +39,7 @@ export default ({navigation}) => {
             </TouchableOpacity>
             <Text>Tap to change picture</Text>
         </View>
-        <TextField
-            multiline
+        <MultilineField
             onChange={(text) => { setDescription(text) }}
             value={description} placeholder="Add some description..." />
         {!!description.length && !!image.length && <Button 

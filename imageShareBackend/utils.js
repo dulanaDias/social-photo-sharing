@@ -15,8 +15,8 @@ module.exports = {
         , true)
     },
     getProfilePicture: (profileId) => {
-        return profileId && fs.existsSync(`profileImages/${profileId}`)
-            ? fs.readFileSync(`profileImages/${profileId}`).toString('utf8')
+        return profileId && fs.existsSync(`storage/profileImages/${profileId}`)
+            ? fs.readFileSync(`storage/profileImages/${profileId}`).toString('utf8')
             : ''
     },
     expectFieldFormat: (fieldTypes, body) => {

@@ -4,6 +4,27 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { API_URL } from "@env"
 const baseUrl = API_URL
 
+export const networkNavigation = {
+    navigate: () => {
+        console.log("navigation method is not implemented")
+    }
+}
+
+
+// const navigation = useNavigation()
+axios.interceptors.response.use((response) => response,
+ (err) => {
+    console.log(err)
+    if(err.response && err.response.status == 401 && 
+        err.response.data.code == "TOKEN_EXPIRED"
+    ) {
+        AsyncStorage.clear().then(() => {
+            networkNavigation.navigate("auth")
+        })
+    }
+})
+
+
 export default {
     post: async (endpoint, data) => {
         const tokenKey = await AsyncStorage.getItem('authToken')

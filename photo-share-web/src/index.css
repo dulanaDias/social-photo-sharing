@@ -11,11 +11,24 @@ body {
   border-radius: 0.375rem;
   border: solid 1px rgb(136, 102, 57);
 }
-.col-gutter *:not(:first-child) {
+.close-button {
+  display: flex;
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  background-color: white;
+}
+
+.close-button:hover {
+  background-color: #f4afaf;
+}
+
+.col-gutter > *:not(:first-child) {
   margin-top: 5px;
 }
 
-.col-gutter *:not(:last-child) {
+.col-gutter > *:not(:last-child) {
   margin-bottom: 5px;
 }
 
